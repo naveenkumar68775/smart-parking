@@ -12,7 +12,7 @@ export const SocketProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
-    const socket = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000', {
+    const socket = io(import.meta.env.VITE_SOCKET_URL || 'https://smart-parking-back.onrender.com', {
       withCredentials: true,
     });
     socketRef.current = socket;
