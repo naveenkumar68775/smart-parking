@@ -10,4 +10,5 @@ const generateRefreshToken = (id) =>
     expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
   });
 
-module.exports = { generateAccessToken, generateRefreshToken };
+module.exports = { generateAccessToken, generateRefreshToken 
+};

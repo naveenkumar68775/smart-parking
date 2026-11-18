@@ -1,9 +1,4 @@
-/**
- * Lightweight text/HTML invoice generator.
- * Returns an HTML string that the frontend can render/print as a PDF via the browser's
- * print dialog, and also a plain-text version used in emails.
- * (Swap in `pdfkit` here for a true binary PDF file if needed.)
- */
+
 const buildInvoiceHtml = ({ invoiceNumber, user, booking, payment }) => {
   return `
   <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 24px; border: 1px solid #e5e7eb;">
