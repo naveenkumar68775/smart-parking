@@ -2,11 +2,19 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
-    if (!process.env.MONGO_URI) {
-      throw new Error('MONGO_URI is missing in your backend/.env file.');
+    let mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/smart_parking';
+    mongoUri = mongoUri.trim();
+
+    // Determine dbName fallback if URI ends with / or has no database name specified
+    const uriWithoutProtocol = mongoUri.replace(/^mongodb(\+srv)?:\/\/[^/]+/, '');
+    const cleanPath = uriWithoutProtocol.replace(/^\//, '').split('?')[0];
+    const connectOptions = {};
+    if (!cleanPath) {
+      connectOptions.dbName = 'smart_parking';
     }
-    const conn = await mongoose.connect(process.env.MONGO_URI);
-    console.log(`[MongoDB] Connected successfully: ${conn.connection.host}`);
+
+    const conn = await mongoose.connect(mongoUri, connectOptions);
+    console.log(`[MongoDB] Connected successfully: ${conn.connection.host}/${conn.connection.name}`);
 
     // Auto-seed initial parking slots if database is currently empty
     const Slot = require('../models/Slot');
@@ -42,6 +50,29 @@ const connectDB = async () => {
       });
       await Slot.insertMany(toCreate);
       console.log(`[MongoDB] Auto-seeded ${toCreate.length} initial parking slots across 6 floors!`);
+    }
+
+    // Auto-seed demo users if none exist
+    const User = require('../models/User');
+    const userCount = await User.countDocuments();
+    if (userCount === 0) {
+      await User.create([
+        {
+          name: 'Admin User',
+          email: 'admin@smartparking.com',
+          password: 'admin123',
+          role: 'admin',
+          phone: '9999999999',
+        },
+        {
+          name: 'Demo User',
+          email: 'user@smartparking.com',
+          password: 'user1234',
+          role: 'user',
+          phone: '8888888888',
+        },
+      ]);
+      console.log('[MongoDB] Auto-seeded demo accounts: admin@smartparking.com / admin123 & user@smartparking.com / user1234');
     }
   } catch (error) {
     console.error(`[MongoDB] Connection error: ${error.message}`);
